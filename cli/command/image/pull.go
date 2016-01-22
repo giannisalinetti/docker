@@ -7,6 +7,7 @@ import (
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/cli"
 	"github.com/docker/docker/cli/command"
+	refutils "github.com/docker/docker/reference"
 	"github.com/docker/docker/registry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -64,16 +65,16 @@ func runPull(dockerCli *command.DockerCli, opts pullOptions) error {
 
 	ctx := context.Background()
 
-	authConfig := command.ResolveAuthConfig(ctx, dockerCli, repoInfo.Index)
-	requestPrivilege := command.RegistryAuthenticationPrivilegedFunc(dockerCli, repoInfo.Index, "pull")
+	requestPrivilege := command.RegistryAuthenticationPrivilegedFunc(dockerCli, repoInfo.Index, "pull", refutils.IsReferenceFullyQualified(distributionRef))
 
 	// Check if reference has a digest
 	_, isCanonical := distributionRef.(reference.Canonical)
 	if command.IsTrusted() && !isCanonical {
-		err = trustedPull(ctx, dockerCli, repoInfo, distributionRef, authConfig, requestPrivilege)
+		err = trustedPull(ctx, dockerCli, repoInfo, distributionRef, requestPrivilege)
 	} else {
-		err = imagePullPrivileged(ctx, dockerCli, authConfig, reference.FamiliarString(distributionRef), requestPrivilege, opts.all)
+		err = imagePullPrivileged(ctx, dockerCli, distributionRef, requestPrivilege, opts.all)
 	}
+
 	if err != nil {
 		if strings.Contains(err.Error(), "when fetching 'plugin'") {
 			return errors.New(err.Error() + " - Use `docker plugin install`")

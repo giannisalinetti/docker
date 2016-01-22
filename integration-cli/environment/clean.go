@@ -81,18 +81,20 @@ func deleteAllImages(t testingT, dockerBinary string, protectedImages map[string
 			continue
 		}
 		fields := strings.Fields(l)
-		imgTag := fields[0] + ":" + fields[1]
-		if _, ok := protectedImages[imgTag]; !ok {
-			if fields[0] == "<none>" || fields[1] == "<none>" {
-				if fields[2] != "<none>" {
-					imgMap[fields[0]+"@"+fields[2]] = struct{}{}
-				} else {
-					imgMap[fields[3]] = struct{}{}
-				}
-				// continue
+		imgRef := fields[0] + ":" + fields[1]
+		if fields[1] == "<none>" {
+			if fields[2] != "<none>" {
+				imgRef = fields[0] + "@" + fields[2]
 			} else {
-				imgMap[imgTag] = struct{}{}
+				imgRef = fields[0]
 			}
+		}
+		if _, ok := protectedImages[imgRef]; !ok {
+			if fields[0] == "<none>" {
+				imgMap[fields[3]] = struct{}{}
+				continue
+			}
+			imgMap[imgRef] = struct{}{}
 		}
 	}
 	if len(imgMap) != 0 {
