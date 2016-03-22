@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/container"
 	"github.com/docker/docker/daemon/caps"
 	daemonconfig "github.com/docker/docker/daemon/config"
+	"github.com/docker/docker/daemon/dockerhooks"
 	"github.com/docker/docker/oci"
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/pkg/mount"
@@ -772,6 +773,13 @@ func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) {
 			}
 		}
 	}
+
+	jsonPath, err := c.ConfigPath()
+	if err != nil {
+		return nil, err
+	}
+
+	s.Hooks = dockerhooks.Generate(s.Hooks, jsonPath)
 
 	if apparmor.IsEnabled() {
 		var appArmorProfile string
