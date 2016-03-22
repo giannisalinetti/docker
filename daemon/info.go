@@ -129,6 +129,7 @@ func (daemon *Daemon) SystemInfo() (*types.Info, error) {
 		LiveRestoreEnabled: daemon.configStore.LiveRestoreEnabled,
 		SecurityOptions:    securityOptions,
 		Isolation:          daemon.defaultIsolation,
+		PkgVersion:         "<unknown>",
 	}
 
 	// Retrieve platform specific info
@@ -156,6 +157,7 @@ func (daemon *Daemon) SystemVersion() types.Version {
 		Arch:          runtime.GOARCH,
 		BuildTime:     dockerversion.BuildTime,
 		Experimental:  daemon.configStore.Experimental,
+		PkgVersion:    "<unknown>",
 	}
 
 	kernelVersion := "<unknown>"

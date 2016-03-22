@@ -15,21 +15,23 @@ import (
 )
 
 var versionTemplate = `Client:
- Version:      {{.Client.Version}}
- API version:  {{.Client.APIVersion}}{{if ne .Client.APIVersion .Client.DefaultAPIVersion}} (downgraded from {{.Client.DefaultAPIVersion}}){{end}}
- Go version:   {{.Client.GoVersion}}
- Git commit:   {{.Client.GitCommit}}
- Built:        {{.Client.BuildTime}}
- OS/Arch:      {{.Client.Os}}/{{.Client.Arch}}{{if .ServerOK}}
+ Version:         {{.Client.Version}}
+ API version:     {{.Client.APIVersion}}{{if ne .Client.APIVersion .Client.DefaultAPIVersion}} (downgraded from {{.Client.DefaultAPIVersion}}){{end}}
+ Package version: {{.Server.PkgVersion}}
+ Go version:      {{.Client.GoVersion}}
+ Git commit:      {{.Client.GitCommit}}
+ Built:           {{.Client.BuildTime}}
+ OS/Arch:         {{.Client.Os}}/{{.Client.Arch}}{{if .ServerOK}}
 
 Server:
- Version:      {{.Server.Version}}
- API version:  {{.Server.APIVersion}} (minimum version {{.Server.MinAPIVersion}})
- Go version:   {{.Server.GoVersion}}
- Git commit:   {{.Server.GitCommit}}
- Built:        {{.Server.BuildTime}}
- OS/Arch:      {{.Server.Os}}/{{.Server.Arch}}
- Experimental: {{.Server.Experimental}}{{end}}`
+ Version:         {{.Server.Version}}
+ API version:     {{.Server.APIVersion}} (minimum version {{.Server.MinAPIVersion}})
+ Package version: {{.Server.PkgVersion}}
+ Go version:      {{.Server.GoVersion}}
+ Git commit:      {{.Server.GitCommit}}
+ Built:           {{.Server.BuildTime}}
+ OS/Arch:         {{.Server.Os}}/{{.Server.Arch}}
+ Experimental:    {{.Server.Experimental}}{{end}}`
 
 type versionOptions struct {
 	format string
@@ -46,6 +48,7 @@ type clientVersion struct {
 	APIVersion        string `json:"ApiVersion"`
 	DefaultAPIVersion string `json:"DefaultAPIVersion,omitempty"`
 	GitCommit         string
+	PkgVersion        string
 	GoVersion         string
 	Os                string
 	Arch              string
@@ -97,6 +100,7 @@ func runVersion(dockerCli *command.DockerCli, opts *versionOptions) error {
 			Version:           dockerversion.Version,
 			APIVersion:        dockerCli.Client().ClientVersion(),
 			DefaultAPIVersion: dockerCli.DefaultVersion(),
+			PkgVersion:        "<unknown>",
 			GoVersion:         runtime.Version(),
 			GitCommit:         dockerversion.GitCommit,
 			BuildTime:         dockerversion.BuildTime,
