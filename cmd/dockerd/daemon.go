@@ -525,6 +525,10 @@ func (cli *DaemonCli) initMiddlewares(s *apiserver.Server, cfg *apiserver.Config
 	cli.authzMiddleware = authorization.NewMiddleware(cli.Config.AuthorizationPlugins, pluginStore)
 	cli.Config.AuthzMiddleware = cli.authzMiddleware
 	s.UseMiddleware(cli.authzMiddleware)
+
+	a := middleware.NewAuditMiddleware(cli.d)
+	s.UseMiddleware(a)
+
 	return nil
 }
 
