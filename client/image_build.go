@@ -120,6 +120,11 @@ func (cli *Client) imageBuildOptionsToQuery(options types.ImageBuildOptions) (ur
 		return query, err
 	}
 	query.Set("cachefrom", string(cacheFromJSON))
+	buildBindsJSON, err := json.Marshal(options.Binds)
+	if err != nil {
+		return query, err
+	}
+	query.Set("buildbinds", string(buildBindsJSON))
 
 	return query, nil
 }
