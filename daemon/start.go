@@ -141,6 +141,13 @@ func (daemon *Daemon) containerStart(container *container.Container, checkpoint 
 		return err
 	}
 
+	// RHEL:secrets -- inject the RHEL secret store
+	if daemon.configStore.EnableSecrets {
+		if err := daemon.injectRHELSecretStore(container); err != nil {
+			return err
+		}
+	}
+
 	spec, err := daemon.createSpec(container)
 	if err != nil {
 		return err
